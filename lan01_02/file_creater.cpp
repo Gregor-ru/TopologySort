@@ -1,4 +1,5 @@
 #include "file_creater.h"
+#include "graph.h"
 
 void random_txt_creator(int objectCount, const string& directory, const string& fileName) {
     if (objectCount < 1) {
@@ -18,25 +19,31 @@ void random_txt_creator(int objectCount, const string& directory, const string& 
     random_device rd;
     mt19937 gen(rd());
 
+    MyList orderList;
+    for (int i = 0; i < objectCount; i++) {
+        orderList.push_back(to_string(i));
+    }
+
     fileStream << objectCount;
     fileStream << endl;
 
+    MyList::Node* followsNode = orderList.begin();
+
     for (int i = 0; i < objectCount; i++) {
-        int precedes = gen() % objectCount;
-        int follows = i;
+        MyList::Node* precedesNode = orderList.begin();
 
-        if (precedes == follows) {
-            precedes = (precedes + 1) % objectCount;
-        }
-
-        fileStream << char('a' + precedes) << "<" << char('a' + follows);
-
-        if (i < objectCount) {
+        while (precedesNode != followsNode) {
+            fileStream << char('a' + stoi(precedesNode->data)) << "<" << char('a' + stoi(followsNode->data));
             fileStream << endl;
+
+            precedesNode = precedesNode->next;
         }
+
+        followsNode = followsNode->next;
     }
 
     fileStream.close();
 
     cout << "Random file created: " << fileFullName << endl;
 }
+
